@@ -8,6 +8,6 @@
 
 int produit(int a, int b) ;
 
-
+int somme(int a, int b);
 
 #endif

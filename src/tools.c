@@ -11,3 +11,9 @@ int produit(int a, int b)  // La fonction produit
 {
     return (a * b);
 }
+
+
+int somme(int a, int b)  // La fonction produit 
+{
+    return a + b;
+}
