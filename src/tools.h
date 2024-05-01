@@ -21,68 +21,29 @@ typedef struct Listemprunts Listemprunts;
 typedef struct Date Date;
 
 // structures des Statistiques
-
 typedef struct StatistiquesLivre StatistiquesLivre;
 
-// Affichage du menu principal
+// Déclaration de l'énumération pour les choix du menu principal
+typedef enum MenuChoice MenuChoice;
 
-void printMainMenu();
-// fonctions des livres
-void initialiserListeLivres(ListeLivres *liste);
-//Livre Enregistrementlivre(Livre livre);
-Livre Enregistrementlivre(Livre livre, CelluleLivre *listeLivres);
-void Ajouterlivre(ListeLivres *liste, Livre livre);
-void afficherLivre(Livre livre);
-void Afficherlistelivre(ListeLivres *listelivre);
-int affichernombretotallivrebibliotheque(ListeLivres *liste);
-Livre rechercherLivreParID(CelluleLivre *listeLivres, int idLivre);
-
-// Fonction pour rechercher un livre par titre, auteur ou genre
-void rechercherLivre(ListeLivres *listeLivres);
-// Mettre à jour le nombre d'exemplaires disponibles dans la liste des livres
-void diminuerExemplairesDisponibles(ListeLivres *listeLivres, int idLivre);
-void supprimerLivre(ListeLivres *listeLivres, int idLivre);
-
-// fonctions des utilisateurs
-void initialiserListeutilisateurs(ListeUtilisateurs *liste);
-Utilisateur Enregistrementutilisateur(Utilisateur utilisateur , CelluleUtilisateur *listeUtilisateurs);
-//Utilisateur Enregistrementutilisateur(Utilisateur utilisateur);
-void Ajouterutilisateurs(ListeUtilisateurs *listeUtilisateurs, Utilisateur utilisateur);
-void Afficherlisteutilisateurs(ListeUtilisateurs *listeUtilisateurs);
-// Fonction pour supprimer un utilisateur de la liste des utilisateurs
-void supprimerUtilisateur(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur);
-int utilisateurExiste(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur);
-// fonctions des emprunts
-void initialiserListemprunts(Listemprunts *liste);
-Emprunt Enregistrementemprunt(Emprunt emprunt);
-void Ajouteremprunts(Listemprunts *liste, Emprunt emprunt, ListeUtilisateurs *listeUtilisateurs, ListeLivres *listeLivres);
-// void Ajouteremprunts(Listemprunts *liste, Emprunt emprunt, ListeLivres *listeLivres);
-void AfficherlisteEmprunts(Listemprunts *listemprunts);
-void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const char *nomFichierEmprunts);
-void augmenterExemplairesDisponibles(ListeLivres *listeLivres, int idLivre);
-// Fonction pour supprimer un emprunt de la liste des emprunts
-
-void supprimerEmprunt(Listemprunts *listeEmprunts, int idEmprunt);
-
-void sauvegarderListeLivres(ListeLivres *listeLivres, const char *livres);
-void sauvegarderListeUtilisateurs(ListeUtilisateurs *listeUtilisateurs, const char *nomFichier);
-void sauvegarderListeEmprunts(Listemprunts *listeEmprunts, const char *nomFichier);
-
-void chargerListeLivres(ListeLivres *listeLivres, const char *nomFichier);
-void chargerListeUtilisateurs(ListeUtilisateurs *listeUtilisateurs, const char *nomFichier);
-void chargerListeEmprunts(Listemprunts *listeEmprunts, const char *emprunts, ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs);
-bool livreExiste(ListeLivres *listeLivres, int idLivre);
-
-void modifierElement(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs, Listemprunts *listeEmprunts ,  const char *livres ,  const char *utilisateurs , const char *emprunts);
-void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts);
-//void modifierEmprunt(Listemprunts *listeEmprunts);
-void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs, const char *utilisateurs);
-//void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs);
-void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres);
-//void modifierLivre(ListeLivres *listeLivres);
-void afficherLivresEmpruntesParUtilisateur(Listemprunts *listeEmprunts, ListeLivres *listeLivres);
-void utilisateursEmpruntantLivre(Listemprunts *listeEmprunts, ListeUtilisateurs *listeUtilisateurs);
-
+ enum MenuChoice{
+    CHOIX_A = 'A',
+    CHOIX_B = 'B',
+    CHOIX_C = 'C',
+    CHOIX_D = 'D',
+    CHOIX_E = 'E',
+    CHOIX_F = 'F',
+    CHOIX_G = 'G',
+    CHOIX_H = 'H',
+    CHOIX_I = 'I',
+    CHOIX_J = 'J',
+    CHOIX_K = 'K',
+    CHOIX_L = 'L',
+    CHOIX_M = 'M',
+    CHOIX_N = 'N',
+    CHOIX_O = 'O',
+    CHOIX_QUITTER = 'Q'
+};
 typedef struct Date
 {
     int jour;
@@ -90,7 +51,7 @@ typedef struct Date
     int annee;
 };
 
-typedef struct Livre
+ struct Livre
 {
     int id;
     char titre[100];
@@ -100,18 +61,18 @@ typedef struct Livre
     int nombre_exemplaires;
 };
 
-typedef struct CelluleLivre
+ struct CelluleLivre
 {
     Livre livre;
     CelluleLivre *suivant;
 };
 // Structure de contrôle pour la liste des livres
-typedef struct ListeLivres
+ struct ListeLivres
 {
     CelluleLivre *tete;
 };
 
-typedef struct Utilisateur
+struct Utilisateur
 {
     int id;
     char nom[100];
@@ -121,18 +82,18 @@ typedef struct Utilisateur
     int telephone;
 };
 
-typedef struct CelluleUtilisateur
+ struct CelluleUtilisateur
 {
     Utilisateur utilisateur;
     CelluleUtilisateur *suivant;
 };
 // Structure de contrôle pour la liste des utilisateurs
-typedef struct ListeUtilisateurs
+ struct ListeUtilisateurs
 {
     CelluleUtilisateur *tete;
 };
 
-typedef struct Emprunt
+ struct Emprunt
 {
     int id_emprunt;
     int id_utilisateur;
@@ -142,24 +103,93 @@ typedef struct Emprunt
     bool est_retourne;
 };
 
-typedef struct CelluleEmprunt
+ struct CelluleEmprunt
 {
     Emprunt emprunt;
     CelluleEmprunt *suivant;
 };
-typedef struct Listemprunts
+
+ struct Listemprunts
 {
     CelluleEmprunt *tete;
 };
 
-typedef struct StatistiquesLivre
+ struct StatistiquesLivre
 {
     int id_livre;
     int nombre_emprunts;
     int nombre_retards;
     float taux_emprunts;
     float taux_retards;
-    // Ajoutez d'autres statistiques pertinentes selon vos besoins
+  
 };
+
+// Affichage du menu principal
+
+void printMainMenu();
+
+//*********************************************************** GESTION DES LIVRES **********************************************************
+
+void initialiserListeLivres(ListeLivres *liste);
+Livre Enregistrementlivre(Livre livre);
+void Ajouterlivre(ListeLivres *liste, Livre livre);
+void afficherLivre(Livre livre);
+void Afficherlistelivre(ListeLivres *listelivre);
+bool livreExiste(ListeLivres *listeLivres, int idLivre);
+Livre rechercherLivreParID(CelluleLivre *listeLivres, int idLivre);
+void rechercherLivre(ListeLivres *listeLivres);
+void diminuerExemplairesDisponibles(ListeLivres *listeLivres, int idLivre);
+void supprimerLivre(ListeLivres *listeLivres, int idLivre);
+void trierEtReecrireLivresParIdentifiant(ListeLivres *listeLivres) ;
+void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres);
+void afficherLivresEmpruntesParUtilisateur(Listemprunts *listeEmprunts, ListeLivres *listeLivres);
+
+
+
+//*********************************************************** GESTION DES UTILISATEURS **********************************************************
+void initialiserListeutilisateurs(ListeUtilisateurs *liste);
+Utilisateur Enregistrementutilisateur(Utilisateur utilisateur, CelluleUtilisateur *listeUtilisateurs);
+void Ajouterutilisateurs(ListeUtilisateurs *listeUtilisateurs, Utilisateur utilisateur);
+void Afficherlisteutilisateurs(ListeUtilisateurs *listeUtilisateurs);
+void supprimerUtilisateur(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur);
+int utilisateurExiste(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur);
+void trierEtReecrireUtilisateursParIdentifiant(ListeUtilisateurs *listeUtilisateurs);
+void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs, const char *utilisateurs);
+void utilisateursEmpruntantLivre(Listemprunts *listeEmprunts, ListeUtilisateurs *listeUtilisateurs);
+
+//*********************************************************** GESTION DES EMPRUNTS **********************************************************
+
+void initialiserListemprunts(Listemprunts *liste);
+Emprunt Enregistrementemprunt(Emprunt emprunt);
+void Ajouteremprunts(Listemprunts *liste, Emprunt emprunt, ListeUtilisateurs *listeUtilisateurs, ListeLivres *listeLivres);
+void AfficherlisteEmprunts(Listemprunts *listemprunts);
+void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const char *nomFichierEmprunts);
+void augmenterExemplairesDisponibles(ListeLivres *listeLivres, int idLivre);
+void supprimerEmprunt(Listemprunts *listeEmprunts, int idEmprunt);
+void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts);
+
+
+//*********************************************************** SAUVEGARDE DES FICHIERS  **********************************************************
+
+void sauvegarderListeLivres(ListeLivres *listeLivres, const char *livres);
+void sauvegarderListeUtilisateurs(ListeUtilisateurs *listeUtilisateurs, const char *nomFichier);
+void sauvegarderListeEmprunts(Listemprunts *listeEmprunts, const char *nomFichier);
+void chargerListeLivres(ListeLivres *listeLivres, const char *nomFichier);
+void chargerListeUtilisateurs(ListeUtilisateurs *listeUtilisateurs, const char *nomFichier);
+void chargerListeEmprunts(Listemprunts *listeEmprunts, const char *emprunts, ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs);
+
+
+//*********************************************************** SATISTIQUES BIBLIOTHEQUE  **********************************************************
+
+void modifierElement(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs, Listemprunts *listeEmprunts, const char *livres, const char *utilisateurs, const char *emprunts);
+void statistiques(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs, Listemprunts *listemprunts);
+float calculerMoyenneEmpruntsParUtilisateur(Listemprunts *listeEmprunts, ListeUtilisateurs *listeUtilisateurs);
+void afficherNombreExemplairesDisponibles(ListeLivres *listeLivres);
+void afficherNombreEmprunts(Listemprunts *listemprunts);
+void afficherNombreUtilisateurs(ListeUtilisateurs *listeUtilisateurs);
+void afficherNombreLivres(ListeLivres *listeLivres);
+
+
+
 
 #endif

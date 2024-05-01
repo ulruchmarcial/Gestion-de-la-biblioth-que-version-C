@@ -11,6 +11,7 @@ FILE *Utilisateur_file = NULL;
 FILE *emprunt_file = NULL;
 
 void main(int argc, char *argv[])
+
 {
     ListeLivres listeLivres;
     initialiserListeLivres(&listeLivres);
@@ -32,14 +33,14 @@ void main(int argc, char *argv[])
         printMainMenu();
 
         printf("Faites votre choix:  ");
-
+           
         choix = getchar();
-
-        switch (choix)
+        choix = toupper(choix); // Convertir en majuscule
+        switch ((MenuChoice)choix)
         {
-        case 'A':
+        case CHOIX_A:
 
-            Livre nouveaulivre =  Enregistrementlivre( livre, &listeLivres) ;
+            Livre nouveaulivre = Enregistrementlivre(livre);
 
             Ajouterlivre(&listeLivres, nouveaulivre);
             sauvegarderListeLivres(&listeLivres, "livres.txt");
@@ -49,9 +50,9 @@ void main(int argc, char *argv[])
             system("clear");
 
             break;
-        case 'B':
+        case CHOIX_B:
 
-            Utilisateur nouveauutilisateur = Enregistrementutilisateur(utilisateur , &listeUtilisateurs);
+            Utilisateur nouveauutilisateur = Enregistrementutilisateur(utilisateur, &listeUtilisateurs);
             Ajouterutilisateurs(&listeUtilisateurs, nouveauutilisateur);
             sauvegarderListeUtilisateurs(&listeUtilisateurs, "utilisateurs.txt");
             printf("\nUtilisateur enregistré. Appuyez sur Entrée pour revenir au menu...");
@@ -60,7 +61,7 @@ void main(int argc, char *argv[])
             system("clear");
 
             break;
-        case 'C':
+        case CHOIX_C:
 
             rechercherLivre(&listeLivres);
             printf("\n Appuyez sur Entrée pour revenir au menu...");
@@ -68,7 +69,7 @@ void main(int argc, char *argv[])
             system("clear");
             break;
 
-        case 'D':
+        case CHOIX_D:
 
             Emprunt nouvelemprunt = Enregistrementemprunt(emprunt);
             Ajouteremprunts(&listemprunts, nouvelemprunt, &listeUtilisateurs, &listeLivres);
@@ -81,39 +82,41 @@ void main(int argc, char *argv[])
 
             break;
 
-        case 'E':
+        case CHOIX_E:
             retournerLivre(&listemprunts, &listeLivres, "emprunts.txt");
-            //retournerLivre(&listemprunts, &listeLivres);
+            // retournerLivre(&listemprunts, &listeLivres);
             augmenterExemplairesDisponibles(&listeLivres, idLivre);
             printf("\n Appuyez sur Entrée pour revenir au menu...");
             getchar(); // Attendez l'entrée de l'utilisateur
             system("clear");
             break;
 
-        case 'F':
+        case CHOIX_F:
             printf("     *************************************** LISTE DES LIVRES  *************************************** \n");
             Afficherlistelivre(&listeLivres);
+            trierEtReecrireLivresParIdentifiant(&listeLivres); 
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
 
             break;
-        case 'G':
+        case CHOIX_G:
             printf("  *************************************** LISTE DES UTILISATEURS  *************************************** \n");
             Afficherlisteutilisateurs(&listeUtilisateurs);
+            trierEtReecrireUtilisateursParIdentifiant(&listeUtilisateurs);
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
 
-        case 'H':
+        case CHOIX_H:
             printf("  *************************************** LISTE DES EMPRUNTS   *************************************** \n");
             AfficherlisteEmprunts(&listemprunts);
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-        case 'I':
+        case CHOIX_I:
             int idLivreASupprimer;
             printf("Veuillez saisir l'identifiant du livre à supprimer : ");
             scanf("%d", &idLivreASupprimer);
@@ -122,7 +125,7 @@ void main(int argc, char *argv[])
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-        case 'J':
+        case CHOIX_J:
             int idUtilisateurASupprimer;
             printf("Veuillez saisir l'identifiant dE l'utilisateur  à supprimer : ");
             scanf("%d", &idUtilisateurASupprimer);
@@ -131,7 +134,7 @@ void main(int argc, char *argv[])
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-        case 'K':
+        case CHOIX_K:
             int idEmpruntASupprimer;
             printf("Veuillez saisir l'identifiant dE l'emprunt   à supprimer : ");
             scanf("%d", &idEmpruntASupprimer);
@@ -140,35 +143,40 @@ void main(int argc, char *argv[])
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-            case 'L':
-            modifierElement(&listeLivres, &listeUtilisateurs, &listemprunts ,"livres.txt","utilisateurs.txt", "emprunts.txt");
+        case CHOIX_L:
+            modifierElement(&listeLivres, &listeUtilisateurs, &listemprunts, "livres.txt", "utilisateurs.txt", "emprunts.txt");
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-            case 'M':
+        case CHOIX_M:
             afficherLivresEmpruntesParUtilisateur(&listemprunts, &listeLivres);
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-            case 'O':
+        case CHOIX_N:
             utilisateursEmpruntantLivre(&listemprunts, &listeUtilisateurs);
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-        
-        case 'N':
-            nbre_total_livre = affichernombretotallivrebibliotheque(&listeLivres );
-            printf("le nombre  total de livres  dans la  bibliotheque est : %d \n", nbre_total_livre);
+        case CHOIX_O:
+            statistiques(&listeLivres, &listeUtilisateurs, &listemprunts);
+            printf("Appuyez sur Entrée pour continuer...");
+            getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
+            getchar(); // Attendez l'entrée de l'utilisateur
+              break;
+            case CHOIX_QUITTER:
+            // Sortir de la boucle si l'utilisateur choisit de quitte
+            break;
+        default:
+            printf("Choix invalide. Veuillez réessayer.\n");
             printf("Appuyez sur Entrée pour continuer...");
             getchar(); // Consomme le caractère de nouvelle ligne restant dans le tampon
             getchar(); // Attendez l'entrée de l'utilisateur
             break;
-        default:
-            break;
         }
 
-    } while (choix != 'Q' && choix != 'q');
+    } while ((MenuChoice)choix != CHOIX_QUITTER);
 }

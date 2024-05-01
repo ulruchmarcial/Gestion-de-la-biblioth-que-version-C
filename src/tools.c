@@ -16,15 +16,15 @@ void printMainMenu()
     printf("               ***************************************      GESTION D'UNE BIBLIOTHEQUE   *******************************************\n");
     printf("               *********************************************************************************************************************\n\n");
     printf("                                                      MENU PRINCIPAL : \n");
-    printf("                - A. AJOUTER UN LIVRE.                                            -I. SUPPRIMMER UN LIVRE. \n");
+    printf("                - A. AJOUTER UN LIVRE.                                            -I. SUPPRIMMER UN LIVRE (EXEMPLAIRE). \n");
     printf("                - B. AJOUTER UN UTILISATEUR.                                      -J. SUPPRIMMER UN UTILISATEUR. \n");
     printf("                - C. RECHERCHER UN LIVRE.                                         -K. SUPPRIMMER UN EMPRUNT. \n");
     printf("                - D. EMPRUNTER UN LIVRE.                                          -L. MODIFIER LES INFORMATIONS (D'UN LIVRE , D'UN UTILISATEUR ,D'UN EMPRUNT). \n");
     printf("                - E. RETOURNER UN LIVRE .                                         -M. LISTE DE LIVRE EMPRUNTE PAR UN UTILISATEUR . \n");
-    printf("                - F. AFFICHER LA LISTE DES LIVRES .                               -O. LISTE DES UTILISATEURS AYANT EMPRUNTES UN LIVRE   \n");
-    printf("                - G. AFFICHER LA LISTE DES UTILISATEURS.                          -N. AFFICHER LE NOMBRE TOTAL DE LIVRES DE LA BIBLIOTHEQUE. \n");
+    printf("                - F. AFFICHER LA LISTE DES LIVRES .                               -N. LISTE DES UTILISATEURS AYANT EMPRUNTES UN LIVRE   \n");
+    printf("                - G. AFFICHER LA LISTE DES UTILISATEURS.                          -O. STATISTIQUES DIVERS DE LA BIBLIOTHEQUE . \n");
     printf("                - H. AFFICHER LA LISTE DES EMPRUNTS.\n");
-    printf("                                                             - Q QUITTER L'APPLICATION.\n");
+    printf("                                                       - Q QUITTER L'APPLICATION.\n");
 }
 // fonction pour Initialiser la liste des  livres
 
@@ -34,17 +34,11 @@ void initialiserListeLivres(ListeLivres *liste)
 }
 
 // fonction pour enregistrement d'un livre
-Livre Enregistrementlivre(Livre livre, CelluleLivre *listeLivres)
+Livre Enregistrementlivre(Livre livre)
 {
     Livre nouveaulivre;
     printf("entrer l'identifiant du livre : \n ");
     scanf("%d", &nouveaulivre.id);
-    if (livreExiste(listeLivres, nouveaulivre.id))
-    {
-      printf("impossible car un livre avec cet identifiant existe deja !! \n "); 
-      return ; 
-    }
-    
     printf("entrer le titre du livre : \n ");
     scanf("%s", nouveaulivre.titre);
     printf("entrer l'auteur du livre : \n ");
@@ -64,13 +58,12 @@ Livre Enregistrementlivre(Livre livre, CelluleLivre *listeLivres)
 
 void Ajouterlivre(ListeLivres *liste, Livre livre)
 {
-    
-    
+
     CelluleLivre *nouveauLivre;
     nouveauLivre = (CelluleLivre *)malloc(sizeof(CelluleLivre));
 
     nouveauLivre->livre = livre;
-    
+
     nouveauLivre->suivant = NULL;
 
     if (liste->tete == NULL)
@@ -119,94 +112,89 @@ void Afficherlistelivre(ListeLivres *listelivre)
     }
 }
 
-// Fonction pour afficher le nombre total de livres de la bibliotheque
-
-int affichernombretotallivrebibliotheque(ListeLivres *liste)
-{
-    if (liste == NULL)
-    {
-        printf(" il n'y a aucun livre dans la bibliotheque pour l'instant\n");
-        return;
-    }
-
-    int nbre = 0;
-    CelluleLivre *p = liste->tete;
-    while (p != NULL)
-    {
-        nbre++;
-        p = p->suivant;
-    }
-    return nbre;
-}
 // Fonction pour supprimer un livre dans la bibliotheque
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+// Supprime un livre de la liste et réécrit le fichier des livres
 void supprimerLivre(ListeLivres *listeLivres, int idLivre)
 {
-    // Vérifiez si la liste est vide
-    if (listeLivres->tete == NULL)
+    if (listeLivres == NULL || listeLivres->tete == NULL)
     {
         printf("La liste des livres est vide.\n");
         return;
     }
 
-    // Recherche du livre avec l'identifiant donné
-    CelluleLivre *courant = listeLivres->tete;
+    // Recherche du livre à supprimer dans la liste
     CelluleLivre *precedent = NULL;
+    CelluleLivre *courant = listeLivres->tete;
     while (courant != NULL && courant->livre.id != idLivre)
     {
         precedent = courant;
         courant = courant->suivant;
     }
 
+    // Si le livre n'est pas trouvé dans la liste
     if (courant == NULL)
     {
         printf("Aucun livre trouvé avec l'identifiant %d.\n", idLivre);
         return;
     }
 
-    // Si le livre est trouvé, mettez à jour le nombre d'exemplaires disponibles
-    courant->livre.nombre_exemplaires--;
-
-    // Si le nombre d'exemplaires disponibles est devenu 0 après la mise à jour,
-    // supprimez-le de la liste des livres
-    if (courant->livre.nombre_exemplaires <= 0)
+    // Décrémentation du nombre d'exemplaires du livre
+    if (courant->livre.nombre_exemplaires > 0)
     {
+        courant->livre.nombre_exemplaires--;
+    }
+    else
+    {
+        printf("Le livre avec l'identifiant %d n'a plus d'exemplaires disponibles.\n", idLivre);
+        return;
+    }
+
+    // Si le nombre d'exemplaires atteint 0 après décrémentation, supprimer le livre de la liste
+    if (courant->livre.nombre_exemplaires == 0)
+    {
+        // Suppression du livre de la liste
         if (precedent == NULL)
         {
-            // Si le livre est en tête de liste
+            // Si le livre à supprimer est en tête de liste
             listeLivres->tete = courant->suivant;
         }
         else
         {
-            // Si le livre n'est pas en tête de liste
+            // Si le livre à supprimer est au milieu ou à la fin de la liste
             precedent->suivant = courant->suivant;
         }
-        printf("Livre avec l'identifiant %d supprimé avec succès.\n", idLivre);
-        free(courant);
-    }
-    else
-    {
-        printf("Un exemplaire du livre avec l'identifiant %d a été supprimé.\n", idLivre);
+        free(courant); // Libération de la mémoire occupée par la cellule du livre supprimé
     }
 
-    //  réécrire le fichier avec la liste mise à jour
-    FILE *fichier = fopen("livres.txt", "w");
-    if (fichier == NULL)
+    // Réécriture du fichier des livres avec la nouvelle liste de livres
+    FILE *fichierLivres = fopen("livres.txt", "w");
+    if (fichierLivres == NULL)
     {
-        printf("Erreur lors de l'ouverture du fichier.\n");
+        printf("Erreur lors de l'ouverture du fichier livres.txt en écriture.\n");
         return;
     }
 
+    // Parcours de la liste mise à jour et réécriture dans le fichier
     courant = listeLivres->tete;
     while (courant != NULL)
     {
-        fprintf(fichier, "%d %s %d\n", courant->livre.id, courant->livre.titre, courant->livre.nombre_exemplaires);
+        fprintf(fichierLivres, "%d %s %s %d %s %d\n", courant->livre.id,
+                courant->livre.titre, courant->livre.auteur,
+                courant->livre.annee_publication, courant->livre.genre,
+                courant->livre.nombre_exemplaires);
         courant = courant->suivant;
     }
 
-    fclose(fichier);
+    // Fermeture du fichier
+    fclose(fichierLivres);
+    printf("Le livre avec l'identifiant %d a été supprimé avec succès.\n", idLivre);
 }
-
 
 // Fonction pour rechercher un livre par titre, auteur ou genre
 
@@ -282,25 +270,31 @@ void rechercherLivre(ListeLivres *listeLivres)
 
 // Fonction pour retourner un livre emprunté
 // Fonction pour retourner un livre
-void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const char *emprunts) {
+void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const char *emprunts)
+{
     int id_livre_retourner;
-    
+
     // Demander à l'utilisateur de saisir l'identifiant du livre à retourner
     printf("Entrez l'identifiant du livre à retourner : ");
     scanf("%d", &id_livre_retourner);
-    
+
     // Consommer le caractère de saut de ligne restant
     getchar();
-    
+
     // Rechercher et supprimer l'emprunt associé au livre retourné
     CelluleEmprunt *precedent = NULL;
     CelluleEmprunt *courantEmprunt = listemprunts->tete;
-    while (courantEmprunt != NULL) {
-        if (courantEmprunt->emprunt.id_livre_emprunte == id_livre_retourner) {
+    while (courantEmprunt != NULL)
+    {
+        if (courantEmprunt->emprunt.id_livre_emprunte == id_livre_retourner)
+        {
             // Supprimer l'emprunt de la liste des emprunts
-            if (precedent != NULL) {
+            if (precedent != NULL)
+            {
                 precedent->suivant = courantEmprunt->suivant;
-            } else {
+            }
+            else
+            {
                 listemprunts->tete = courantEmprunt->suivant;
             }
             free(courantEmprunt);
@@ -309,16 +303,18 @@ void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const 
         precedent = courantEmprunt;
         courantEmprunt = courantEmprunt->suivant;
     }
-    
+
     // Mettre à jour le fichier des emprunts pour refléter la suppression
     FILE *fichierEmprunts = fopen(emprunts, "w");
-    if (fichierEmprunts == NULL) {
+    if (fichierEmprunts == NULL)
+    {
         printf("Erreur : Impossible d'ouvrir le fichier des emprunts.\n");
         return;
     }
-    
+
     courantEmprunt = listemprunts->tete;
-    while (courantEmprunt != NULL) {
+    while (courantEmprunt != NULL)
+    {
         fprintf(fichierEmprunts, "%d %d %d %d/%d/%d %d/%d/%d %d\n",
                 courantEmprunt->emprunt.id_emprunt,
                 courantEmprunt->emprunt.id_utilisateur,
@@ -330,16 +326,18 @@ void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const 
                 courantEmprunt->emprunt.date_retour_prevue.mois,
                 courantEmprunt->emprunt.date_retour_prevue.annee,
                 courantEmprunt->emprunt.est_retourne ? 1 : 0);
-        
+
         courantEmprunt = courantEmprunt->suivant;
     }
-    
+
     fclose(fichierEmprunts);
-    
+
     // Parcourir la liste des livres pour trouver celui à retourner
     CelluleLivre *courantLivre = listeLivres->tete;
-    while (courantLivre != NULL) {
-        if (courantLivre->livre.id == id_livre_retourner) {
+    while (courantLivre != NULL)
+    {
+        if (courantLivre->livre.id == id_livre_retourner)
+        {
             // Incrémenter le nombre d'exemplaires disponibles
             courantLivre->livre.nombre_exemplaires++;
             printf("Le livre avec l'ID %d a été retourné avec succès.\n", id_livre_retourner);
@@ -347,19 +345,20 @@ void retournerLivre(Listemprunts *listemprunts, ListeLivres *listeLivres, const 
         }
         courantLivre = courantLivre->suivant;
     }
-    
+
     printf("Erreur : Le livre avec l'ID %d n'a pas été trouvé dans la liste des livres.\n", id_livre_retourner);
 }
 
-
-
 // Fonction pour rechercher un livre par son ID dans la liste des livres
-Livre rechercherLivreParID( CelluleLivre *listeLivres, int idLivre) {
+Livre rechercherLivreParID(CelluleLivre *listeLivres, int idLivre)
+{
     CelluleLivre *courant = listeLivres;
 
     // Parcourir la liste des livres
-    while (courant != NULL) {
-        if (courant->livre.id == idLivre) {
+    while (courant != NULL)
+    {
+        if (courant->livre.id == idLivre)
+        {
             // Le livre avec l'ID spécifié a été trouvé
             return (courant->livre);
         }
@@ -367,7 +366,7 @@ Livre rechercherLivreParID( CelluleLivre *listeLivres, int idLivre) {
     }
 
     // Le livre avec l'ID spécifié n'a pas été trouvé
-    return ;
+    return;
 }
 
 // Fonction pour augmenter le nombre d'exemplaires disponibles pour un livre donné
@@ -401,19 +400,12 @@ void initialiserListeutilisateurs(ListeUtilisateurs *liste)
 
 //  Fonction pour enregistrement d'un utilisateur
 
-Utilisateur Enregistrementutilisateur(Utilisateur utilisateur , CelluleUtilisateur *listeUtilisateurs)
+Utilisateur Enregistrementutilisateur(Utilisateur utilisateur, CelluleUtilisateur *listeUtilisateurs)
 {
     Utilisateur util;
 
     printf("entrer l'identifiant de l'utilisateur \n");
     scanf("%d", &util.id);
-    if (utilisateurExiste(listeUtilisateurs, util.id))
-    {
-    printf("imppossible un utilisateur avec cet identifiant exite deja !!\n");
-    return ; 
-    }
-    
-    
     printf("entrer le nom  de l'utilisateur \n");
     scanf("%s", util.nom);
     printf("entrer le prenom  de l'utilisateur \n");
@@ -486,14 +478,14 @@ void Afficherlisteutilisateurs(ListeUtilisateurs *listeUtilisateurs)
 
 void supprimerUtilisateur(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur)
 {
-    // Vérifier si la liste est vide
-    if (listeUtilisateurs->tete == NULL)
+    // Vérifier si la liste d'utilisateurs est vide
+    if (listeUtilisateurs == NULL || listeUtilisateurs->tete == NULL)
     {
-        printf("La liste des utilisateurs est vide.\n");
+        printf("La liste d'utilisateurs est vide.\n");
         return;
     }
 
-    // Recherche de l'utilisateur avec l'identifiant donné
+    // Rechercher l'utilisateur dans la liste
     CelluleUtilisateur *courant = listeUtilisateurs->tete;
     CelluleUtilisateur *precedent = NULL;
     while (courant != NULL && courant->utilisateur.id != idUtilisateur)
@@ -512,37 +504,35 @@ void supprimerUtilisateur(ListeUtilisateurs *listeUtilisateurs, int idUtilisateu
     // Supprimer l'utilisateur de la liste
     if (precedent == NULL)
     {
-        // Si l'utilisateur est en tête de liste
+        // L'utilisateur à supprimer est en tête de liste
         listeUtilisateurs->tete = courant->suivant;
     }
     else
     {
-        // Si l'utilisateur n'est pas en tête de liste
         precedent->suivant = courant->suivant;
     }
+    free(courant); // Libérer la mémoire de l'utilisateur supprimé
 
-    // Libérer la mémoire de la cellule de l'utilisateur supprimé
-    free(courant);
-
-    printf("Utilisateur avec l'identifiant %d supprimé avec succès.\n", idUtilisateur);
-
-    //  réécrire le fichier avec la liste mise à jour
-
-    FILE *fichier = fopen("utilisateurs.txt", "w");
-    if (fichier == NULL)
+    // Réécrire le fichier utilisateur avec la liste mise à jour
+    FILE *fichierUtilisateurs = fopen("utilisateurs.txt", "w");
+    if (fichierUtilisateurs == NULL)
     {
-        printf("Erreur lors de l'ouverture du fichier.\n");
+        printf("Erreur lors de l'ouverture du fichier utilisateurs.txt.\n");
         return;
     }
 
     courant = listeUtilisateurs->tete;
     while (courant != NULL)
     {
-        fprintf(fichier, "%d %s\n", courant->utilisateur.id, courant->utilisateur.nom);
+        fprintf(fichierUtilisateurs, "%d %s %s %s %s %d\n", courant->utilisateur.id,
+                courant->utilisateur.nom, courant->utilisateur.prenom,
+                courant->utilisateur.adresse, courant->utilisateur.email,
+                courant->utilisateur.telephone);
         courant = courant->suivant;
     }
 
-    fclose(fichier);
+    fclose(fichierUtilisateurs);
+    printf("Utilisateur avec l'identifiant %d supprimé avec succès.\n", idUtilisateur);
 }
 
 //  Fonction pour initialiser liste des emprunts
@@ -932,21 +922,26 @@ void chargerListeEmprunts(Listemprunts *listeEmprunts, const char *emprunts, Lis
 }
 // Fonction pour modifier un livre
 
-void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres) {
+void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres)
+{
     int idLivre;
     printf("Veuillez entrer l'identifiant du livre à modifier : ");
-    if (scanf("%d", &idLivre) != 1) {
+    if (scanf("%d", &idLivre) != 1)
+    {
         printf("Erreur : saisie invalide pour l'identifiant du livre.\n");
-        while (getchar() != '\n'); // Vider le tampon d'entrée
+        while (getchar() != '\n')
+            ; // Vider le tampon d'entrée
         return;
     }
 
     CelluleLivre *courant = listeLivres->tete;
-    while (courant != NULL && courant->livre.id != idLivre) {
+    while (courant != NULL && courant->livre.id != idLivre)
+    {
         courant = courant->suivant;
     }
 
-    if (courant == NULL) {
+    if (courant == NULL)
+    {
         printf("Aucun livre trouvé avec l'identifiant %d.\n", idLivre);
         return;
     }
@@ -971,13 +966,15 @@ void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres) {
 
     // Mettre à jour le fichier des livres pour refléter la modification
     FILE *fichierLivres = fopen(nomFichierLivres, "w");
-    if (fichierLivres == NULL) {
+    if (fichierLivres == NULL)
+    {
         printf("Erreur : Impossible d'ouvrir le fichier des livres.\n");
         return;
     }
 
     courant = listeLivres->tete;
-    while (courant != NULL) {
+    while (courant != NULL)
+    {
         fprintf(fichierLivres, "%d %s %s %d %s %d\n",
                 courant->livre.id,
                 courant->livre.titre,
@@ -985,31 +982,35 @@ void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres) {
                 courant->livre.annee_publication,
                 courant->livre.genre,
                 courant->livre.nombre_exemplaires);
-        
+
         courant = courant->suivant;
     }
-    
+
     fclose(fichierLivres);
 }
 
 // Fonction pour modifier un utilisateur :
 
-
-void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs, const char *utilisateurs) {
+void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs, const char *utilisateurs)
+{
     int idUtilisateur;
     printf("Veuillez entrer l'identifiant de l'utilisateur à modifier : ");
-    if (scanf("%d", &idUtilisateur) != 1) {
+    if (scanf("%d", &idUtilisateur) != 1)
+    {
         printf("Erreur : saisie invalide pour l'identifiant de l'utilisateur.\n");
-        while (getchar() != '\n'); // Vider le tampon d'entrée
+        while (getchar() != '\n')
+            ; // Vider le tampon d'entrée
         return;
     }
 
     CelluleUtilisateur *courant = listeUtilisateurs->tete;
-    while (courant != NULL && courant->utilisateur.id != idUtilisateur) {
+    while (courant != NULL && courant->utilisateur.id != idUtilisateur)
+    {
         courant = courant->suivant;
     }
 
-    if (courant == NULL) {
+    if (courant == NULL)
+    {
         printf("Aucun utilisateur trouvé avec l'identifiant %d.\n", idUtilisateur);
         return;
     }
@@ -1030,13 +1031,15 @@ void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs, const char *utili
 
     // Mettre à jour le fichier des utilisateurs pour refléter la modification
     FILE *fichierUtilisateurs = fopen(utilisateurs, "w");
-    if (fichierUtilisateurs == NULL) {
+    if (fichierUtilisateurs == NULL)
+    {
         printf("Erreur : Impossible d'ouvrir le fichier des utilisateurs.\n");
         return;
     }
 
     courant = listeUtilisateurs->tete;
-    while (courant != NULL) {
+    while (courant != NULL)
+    {
         fprintf(fichierUtilisateurs, "%d %s %s %s %s %d\n",
                 courant->utilisateur.id,
                 courant->utilisateur.nom,
@@ -1044,29 +1047,34 @@ void modifierUtilisateur(ListeUtilisateurs *listeUtilisateurs, const char *utili
                 courant->utilisateur.adresse,
                 courant->utilisateur.email,
                 courant->utilisateur.telephone);
-        
+
         courant = courant->suivant;
     }
-    
+
     fclose(fichierUtilisateurs);
 }
 // Fonction pour modifier un emprunt :
 
-void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts) {
+void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts)
+{
     int idEmprunt;
     printf("Veuillez entrer l'identifiant de l'emprunt à modifier : ");
-    if (scanf("%d", &idEmprunt) != 1) {
+    if (scanf("%d", &idEmprunt) != 1)
+    {
         printf("Erreur : saisie invalide pour l'identifiant de l'emprunt.\n");
-        while (getchar() != '\n'); // Vider le tampon d'entrée
+        while (getchar() != '\n')
+            ; // Vider le tampon d'entrée
         return;
     }
 
     CelluleEmprunt *courant = listeEmprunts->tete;
-    while (courant != NULL && courant->emprunt.id_emprunt != idEmprunt) {
+    while (courant != NULL && courant->emprunt.id_emprunt != idEmprunt)
+    {
         courant = courant->suivant;
     }
 
-    if (courant == NULL) {
+    if (courant == NULL)
+    {
         printf("Aucun emprunt trouvé avec l'identifiant %d.\n", idEmprunt);
         return;
     }
@@ -1081,13 +1089,15 @@ void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts) {
 
     // Mettre à jour le fichier des emprunts pour refléter la modification
     FILE *fichierEmprunts = fopen(emprunts, "w");
-    if (fichierEmprunts == NULL) {
+    if (fichierEmprunts == NULL)
+    {
         printf("Erreur : Impossible d'ouvrir le fichier des emprunts.\n");
         return;
     }
 
     courant = listeEmprunts->tete;
-    while (courant != NULL) {
+    while (courant != NULL)
+    {
         fprintf(fichierEmprunts, "%d %d %d %d/%d/%d %d/%d/%d %d\n",
                 courant->emprunt.id_emprunt,
                 courant->emprunt.id_utilisateur,
@@ -1099,13 +1109,13 @@ void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts) {
                 courant->emprunt.date_retour_prevue.mois,
                 courant->emprunt.date_retour_prevue.annee,
                 courant->emprunt.est_retourne);
-        
+
         courant = courant->suivant;
     }
-    
+
     fclose(fichierEmprunts);
 }
-void modifierElement(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs, Listemprunts *listeEmprunts ,  const char *livres ,  const char *utilisateurs , const char *emprunts)
+void modifierElement(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs, Listemprunts *listeEmprunts, const char *livres, const char *utilisateurs, const char *emprunts)
 {
     int choix;
 
@@ -1119,26 +1129,16 @@ void modifierElement(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisate
     switch (choix)
     {
     case 1:
-        // Modification d'un livre
-        int idLivre;
-        printf("Entrez l'identifiant du livre à modifier : ");
-        scanf("%d", &idLivre);
-       // modifierLivre(listeLivres);
+        // modifierLivre(listeLivres);
         modifierLivre(listeLivres, livres);
         break;
     case 2:
         // Modification d'un utilisateur
-        int idUtilisateur;
-        printf("Entrez l'identifiant de l'utilisateur à modifier : ");
-        scanf("%d", &idUtilisateur);
         modifierUtilisateur(listeUtilisateurs, utilisateurs);
         break;
     case 3:
         // Modification d'un emprunt
-        int idEmprunt;
-        printf("Entrez l'identifiant de l'emprunt à modifier : ");
-        scanf("%d", &idEmprunt);
-        modifierEmprunt(listeEmprunts , emprunts);
+        modifierEmprunt(listeEmprunts, emprunts);
         break;
     default:
         printf("Choix invalide.\n");
@@ -1183,12 +1183,15 @@ void afficherLivresEmpruntesParUtilisateur(Listemprunts *listeEmprunts, ListeLiv
     }
 }
 // Fonction pour obtenir la liste des utilisateurs ayant emprunté un livre spécifique
-void utilisateursEmpruntantLivre(Listemprunts *listeEmprunts, ListeUtilisateurs *listeUtilisateurs) {
+void utilisateursEmpruntantLivre(Listemprunts *listeEmprunts, ListeUtilisateurs *listeUtilisateurs)
+{
     int idLivreRecherche;
     printf("Veuillez entrer l'identifiant du livre : ");
-    if (scanf("%d", &idLivreRecherche) != 1) {
+    if (scanf("%d", &idLivreRecherche) != 1)
+    {
         printf("Erreur : saisie invalide pour l'identifiant du livre.\n");
-        while (getchar() != '\n'); // Vider le tampon d'entrée
+        while (getchar() != '\n')
+            ; // Vider le tampon d'entrée
         return;
     }
 
@@ -1197,11 +1200,15 @@ void utilisateursEmpruntantLivre(Listemprunts *listeEmprunts, ListeUtilisateurs 
 
     printf("Utilisateurs ayant emprunté le livre avec l'identifiant %d :\n", idLivreRecherche);
 
-    while (courantEmprunts != NULL) {
-        if (courantEmprunts->emprunt.id_livre_emprunte == idLivreRecherche) {
+    while (courantEmprunts != NULL)
+    {
+        if (courantEmprunts->emprunt.id_livre_emprunte == idLivreRecherche)
+        {
             CelluleUtilisateur *courantUtilisateurs = listeUtilisateurs->tete;
-            while (courantUtilisateurs != NULL) {
-                if (courantUtilisateurs->utilisateur.id == courantEmprunts->emprunt.id_utilisateur) {
+            while (courantUtilisateurs != NULL)
+            {
+                if (courantUtilisateurs->utilisateur.id == courantEmprunts->emprunt.id_utilisateur)
+                {
                     printf("ID Emprunt : %d\n", courantEmprunts->emprunt.id_emprunt);
                     printf("ID Utilisateur : %d\n", courantUtilisateurs->utilisateur.id);
                     printf("Nom : %s\n", courantUtilisateurs->utilisateur.nom);
@@ -1219,7 +1226,270 @@ void utilisateursEmpruntantLivre(Listemprunts *listeEmprunts, ListeUtilisateurs 
         courantEmprunts = courantEmprunts->suivant;
     }
 
-    if (!livreEmprunte) {
+    if (!livreEmprunte)
+    {
         printf("Aucun utilisateur n'a emprunté ce livre.\n");
     }
+}
+
+// Fonction pour gérer le sous-menu des statistiques
+void statistiques(ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs, Listemprunts *listemprunts)
+{
+    int choix;
+    printf("********************** Sous-menu Statistiques : **********************\n");
+    printf("Veuillez choisir une option : \n");
+    printf("1. Nombre total de livres dans la bibliothèque\n");
+    printf("2. Nombre total d'utilisateurs de la bibliothèque\n");
+    printf("3. Nombre total d'emprunts\n");
+    printf("4. Nombre d'exemplaires disponibles pour chaque livre \n");
+    printf("5. Moyenne d'emprunts par utilisateur \n");
+
+    scanf("%d", &choix);
+
+    switch (choix)
+    {
+    case 1:
+        afficherNombreLivres(listeLivres);
+        break;
+    case 2:
+        afficherNombreUtilisateurs(listeUtilisateurs);
+        break;
+    case 3:
+        afficherNombreEmprunts(listemprunts);
+        break;
+    case 4:
+        afficherNombreExemplairesDisponibles(listeLivres);
+        break;
+    case 5:
+        float moyenne = calculerMoyenneEmpruntsParUtilisateur(listemprunts, listeUtilisateurs);
+        printf("Moyenne d'emprunts par utilisateur : %.2f\n", moyenne);
+        break;
+    default:
+        printf("Choix invalide.\n");
+        break;
+    }
+}
+
+// Fonction pour afficher le nombre total de livres dans la bibliothèque
+void afficherNombreLivres(ListeLivres *listeLivres)
+{
+    int nombreLivres = 0;
+    CelluleLivre *courant = listeLivres->tete;
+    while (courant != NULL)
+    {
+        nombreLivres += courant->livre.nombre_exemplaires;
+        courant = courant->suivant;
+    }
+    printf("Nombre total de livres dans la bibliothèque : %d\n", nombreLivres);
+}
+
+// Fonction pour afficher le nombre total d'utilisateurs de la bibliothèque
+void afficherNombreUtilisateurs(ListeUtilisateurs *listeUtilisateurs)
+{
+    int nombreUtilisateurs = 0;
+    CelluleUtilisateur *courant = listeUtilisateurs->tete;
+    while (courant != NULL)
+    {
+        nombreUtilisateurs++;
+        courant = courant->suivant;
+    }
+    printf("Nombre total d'utilisateurs de la bibliothèque : %d\n", nombreUtilisateurs);
+}
+// Fonction pour afficher le nombre total d'emprunts
+void afficherNombreEmprunts(Listemprunts *listemprunts)
+{
+    int nombreEmprunts = 0;
+    CelluleEmprunt *courant = listemprunts->tete;
+    while (courant != NULL)
+    {
+        nombreEmprunts++;
+        courant = courant->suivant;
+    }
+    printf("Nombre total d'emprunts : %d\n", nombreEmprunts);
+}
+// Fonction pour afficher le nombre d'exemplaires disponibles pour chaque livre
+void afficherNombreExemplairesDisponibles(ListeLivres *listeLivres)
+{
+    CelluleLivre *courant = listeLivres->tete;
+    while (courant != NULL)
+    {
+        printf("Livre : %s\n", courant->livre.titre);
+        printf("Nombre d'exemplaires disponibles : %d\n", courant->livre.nombre_exemplaires);
+        courant = courant->suivant;
+    }
+}
+// Fonction pour calculer la moyenne d'emprunts par utilisateur
+float calculerMoyenneEmpruntsParUtilisateur(Listemprunts *listeEmprunts, ListeUtilisateurs *listeUtilisateurs)
+{
+    int nombreEmprunts = 0;
+    int nombreUtilisateurs = 0;
+
+    // Parcourir la liste des emprunts pour compter le nombre total d'emprunts
+    CelluleEmprunt *courantEmprunt = listeEmprunts->tete;
+    while (courantEmprunt != NULL)
+    {
+        nombreEmprunts++;
+        courantEmprunt = courantEmprunt->suivant;
+    }
+
+    // Parcourir la liste des utilisateurs pour compter le nombre total d'utilisateurs
+    CelluleUtilisateur *courantUtilisateur = listeUtilisateurs->tete;
+    while (courantUtilisateur != NULL)
+    {
+        nombreUtilisateurs++;
+        courantUtilisateur = courantUtilisateur->suivant;
+    }
+
+    // Vérifier si le nombre d'utilisateurs est différent de zéro pour éviter une division par zéro
+    if (nombreUtilisateurs != 0)
+    {
+        return (float)nombreEmprunts / nombreUtilisateurs;
+    }
+    else
+    {
+        // Retourner zéro si le nombre d'utilisateurs est zéro pour éviter une division par zéro
+        return 0.0;
+    }
+}
+#include <stdio.h>
+#include <stdlib.h>
+// trier la liste des livres par ordre croissant d'identifiant et mettre à jour le fichier des livres avec les changements
+void trierEtReecrireLivresParIdentifiant(ListeLivres *listeLivres)
+{
+    if (listeLivres == NULL || listeLivres->tete == NULL)
+    {
+        // Liste vide ou un seul élément, aucun besoin de trier
+        return;
+    }
+
+    // Initialisation d'une liste temporaire pour stocker les livres triés
+    ListeLivres listeTriee;
+    listeTriee.tete = NULL;
+
+    // Parcourir la liste des livres non triés
+    CelluleLivre *courant = listeLivres->tete;
+    while (courant != NULL)
+    {
+        // Sauvegarder le prochain élément de la liste non triée
+        CelluleLivre *suivant = courant->suivant;
+
+        // Insérer le livre courant dans la liste triée
+        if (listeTriee.tete == NULL || courant->livre.id < listeTriee.tete->livre.id)
+        {
+            // Cas spécial : si la liste triée est vide ou si le livre courant a l'ID le plus bas
+            courant->suivant = listeTriee.tete;
+            listeTriee.tete = courant;
+        }
+        else
+        {
+            // Trouver l'emplacement approprié pour insérer le livre courant dans la liste triée
+            CelluleLivre *precedent = listeTriee.tete;
+            while (precedent->suivant != NULL && precedent->suivant->livre.id < courant->livre.id)
+            {
+                precedent = precedent->suivant;
+            }
+            courant->suivant = precedent->suivant;
+            precedent->suivant = courant;
+        }
+
+        // Passer au prochain élément de la liste non triée
+        courant = suivant;
+    }
+
+    // Mettre à jour la tête de la liste des livres avec la liste triée
+    listeLivres->tete = listeTriee.tete;
+
+    // Réécrire le fichier livres.txt avec les livres triés
+    FILE *fichierLivres = fopen("livres.txt", "w");
+    if (fichierLivres == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier livres.txt en écriture.\n");
+        return;
+    }
+
+    // Parcourir la liste des livres triée et réécrire chaque livre dans le fichier
+    courant = listeTriee.tete;
+    while (courant != NULL)
+    {
+        fprintf(fichierLivres, "%d %s %s %d %s %d\n", courant->livre.id,
+                courant->livre.titre, courant->livre.auteur,
+                courant->livre.annee_publication, courant->livre.genre,
+                courant->livre.nombre_exemplaires);
+        courant = courant->suivant;
+    }
+
+    // Fermer le fichier de livres
+    fclose(fichierLivres);
+    printf("Le fichier livres.txt a été mis à jour avec succès.\n");
+}
+
+// classer la liste des utilisateurs par ordre croissant d'identifiant et mettre à jour le fichier d'utilisateurs avec les changements
+
+void trierEtReecrireUtilisateursParIdentifiant(ListeUtilisateurs *listeUtilisateurs)
+{
+    if (listeUtilisateurs == NULL || listeUtilisateurs->tete == NULL)
+    {
+        // Liste vide ou un seul élément, aucun besoin de trier
+        return;
+    }
+
+    // Initialisation d'une liste temporaire pour stocker les utilisateurs triés
+    ListeUtilisateurs listeTriee;
+    listeTriee.tete = NULL;
+
+    // Parcourir la liste des utilisateurs non triés
+    CelluleUtilisateur *courant = listeUtilisateurs->tete;
+    while (courant != NULL)
+    {
+        // Sauvegarder le prochain élément de la liste non triée
+        CelluleUtilisateur *suivant = courant->suivant;
+
+        // Insérer l'utilisateur courant dans la liste triée
+        if (listeTriee.tete == NULL || courant->utilisateur.id < listeTriee.tete->utilisateur.id)
+        {
+            // Cas spécial : si la liste triée est vide ou si l'utilisateur courant a l'ID le plus bas
+            courant->suivant = listeTriee.tete;
+            listeTriee.tete = courant;
+        }
+        else
+        {
+            // Trouver l'emplacement approprié pour insérer l'utilisateur courant dans la liste triée
+            CelluleUtilisateur *precedent = listeTriee.tete;
+            while (precedent->suivant != NULL && precedent->suivant->utilisateur.id < courant->utilisateur.id)
+            {
+                precedent = precedent->suivant;
+            }
+            courant->suivant = precedent->suivant;
+            precedent->suivant = courant;
+        }
+
+        // Passer au prochain élément de la liste non triée
+        courant = suivant;
+    }
+
+    // Mettre à jour la tête de la liste des utilisateurs avec la liste triée
+    listeUtilisateurs->tete = listeTriee.tete;
+
+    // Réécrire le fichier utilisateurs.txt avec les utilisateurs triés
+    FILE *fichierUtilisateurs = fopen("utilisateurs.txt", "w");
+    if (fichierUtilisateurs == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier utilisateurs.txt en écriture.\n");
+        return;
+    }
+
+    // Parcourir la liste des utilisateurs triée et réécrire chaque utilisateur dans le fichier
+    courant = listeTriee.tete;
+    while (courant != NULL)
+    {
+        fprintf(fichierUtilisateurs, "%d %s %s %s %s %d\n", courant->utilisateur.id,
+                courant->utilisateur.nom, courant->utilisateur.prenom,
+                courant->utilisateur.adresse, courant->utilisateur.email,
+                courant->utilisateur.telephone);
+        courant = courant->suivant;
+    }
+
+    // Fermer le fichier d'utilisateurs
+    fclose(fichierUtilisateurs);
+    printf("Le fichier utilisateurs.txt a été mis à jour avec succès.\n");
 }
