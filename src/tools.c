@@ -112,13 +112,6 @@ void Afficherlistelivre(ListeLivres *listelivre)
     }
 }
 
-// Fonction pour supprimer un livre dans la bibliotheque
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-
 // Supprime un livre de la liste et réécrit le fichier des livres
 void supprimerLivre(ListeLivres *listeLivres, int idLivre)
 {
@@ -400,7 +393,7 @@ void initialiserListeutilisateurs(ListeUtilisateurs *liste)
 
 //  Fonction pour enregistrement d'un utilisateur
 
-Utilisateur Enregistrementutilisateur(Utilisateur utilisateur, CelluleUtilisateur *listeUtilisateurs)
+Utilisateur Enregistrementutilisateur(Utilisateur utilisateur)
 {
     Utilisateur util;
 
@@ -431,6 +424,7 @@ void Ajouterutilisateurs(ListeUtilisateurs *listeUtilisateurs, Utilisateur utili
     // Mettre à jour les pointeurs pour ajouter le nouvel utilisateur à la fin de la liste
     nouveauutilisateur->suivant = NULL; // La nouvelle cellule sera la dernière de la liste
     // Si la liste est vide, la nouvelle cellule devient la tête de liste
+
     if (listeUtilisateurs->tete == NULL)
     {
         listeUtilisateurs->tete = nouveauutilisateur;
@@ -649,6 +643,29 @@ int utilisateurExiste(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur)
     }
 
     return 0; // Aucun utilisateur trouvé avec l'identifiant spécifié
+}
+// fonction pour verifier qu'un livre  exite
+
+int livreexiste(ListeLivres *ListeLivres, int idLivre)
+{
+    // Vérifier si la liste des livre est vide
+    if (ListeLivres->tete == NULL)
+    {
+        return 0; // Aucun livre  enregistré dans la liste
+    }
+
+    // Parcourir la liste des livre  pour trouver une correspondance d'identifiant
+    CelluleLivre *P = ListeLivres->tete;
+    while (P != NULL)
+    {
+        if (P->livre.id == idLivre)
+        {
+            return 1; // Le livre  avec l'identifiant spécifié existe dans la liste
+        }
+        P = P->suivant;
+    }
+
+    return 0; // Aucun livre  trouvé avec l'identifiant spécifié
 }
 //  Fonction pour Ajout  d'un emprunt
 

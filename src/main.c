@@ -52,7 +52,7 @@ void main(int argc, char *argv[])
             break;
         case CHOIX_B:
 
-            Utilisateur nouveauutilisateur = Enregistrementutilisateur(utilisateur, &listeUtilisateurs);
+            Utilisateur nouveauutilisateur = Enregistrementutilisateur(utilisateur);
             Ajouterutilisateurs(&listeUtilisateurs, nouveauutilisateur);
             sauvegarderListeUtilisateurs(&listeUtilisateurs, "utilisateurs.txt");
             printf("\nUtilisateur enregistré. Appuyez sur Entrée pour revenir au menu...");

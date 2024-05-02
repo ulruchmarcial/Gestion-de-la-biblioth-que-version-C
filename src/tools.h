@@ -26,7 +26,8 @@ typedef struct StatistiquesLivre StatistiquesLivre;
 // Déclaration de l'énumération pour les choix du menu principal
 typedef enum MenuChoice MenuChoice;
 
- enum MenuChoice{
+enum MenuChoice
+{
     CHOIX_A = 'A',
     CHOIX_B = 'B',
     CHOIX_C = 'C',
@@ -51,7 +52,7 @@ typedef struct Date
     int annee;
 };
 
- struct Livre
+struct Livre
 {
     int id;
     char titre[100];
@@ -61,13 +62,13 @@ typedef struct Date
     int nombre_exemplaires;
 };
 
- struct CelluleLivre
+struct CelluleLivre
 {
     Livre livre;
     CelluleLivre *suivant;
 };
 // Structure de contrôle pour la liste des livres
- struct ListeLivres
+struct ListeLivres
 {
     CelluleLivre *tete;
 };
@@ -82,18 +83,18 @@ struct Utilisateur
     int telephone;
 };
 
- struct CelluleUtilisateur
+struct CelluleUtilisateur
 {
     Utilisateur utilisateur;
     CelluleUtilisateur *suivant;
 };
 // Structure de contrôle pour la liste des utilisateurs
- struct ListeUtilisateurs
+struct ListeUtilisateurs
 {
     CelluleUtilisateur *tete;
 };
 
- struct Emprunt
+struct Emprunt
 {
     int id_emprunt;
     int id_utilisateur;
@@ -103,25 +104,24 @@ struct Utilisateur
     bool est_retourne;
 };
 
- struct CelluleEmprunt
+struct CelluleEmprunt
 {
     Emprunt emprunt;
     CelluleEmprunt *suivant;
 };
 
- struct Listemprunts
+struct Listemprunts
 {
     CelluleEmprunt *tete;
 };
 
- struct StatistiquesLivre
+struct StatistiquesLivre
 {
     int id_livre;
     int nombre_emprunts;
     int nombre_retards;
     float taux_emprunts;
     float taux_retards;
-  
 };
 
 // Affichage du menu principal
@@ -140,15 +140,14 @@ Livre rechercherLivreParID(CelluleLivre *listeLivres, int idLivre);
 void rechercherLivre(ListeLivres *listeLivres);
 void diminuerExemplairesDisponibles(ListeLivres *listeLivres, int idLivre);
 void supprimerLivre(ListeLivres *listeLivres, int idLivre);
-void trierEtReecrireLivresParIdentifiant(ListeLivres *listeLivres) ;
+void trierEtReecrireLivresParIdentifiant(ListeLivres *listeLivres);
 void modifierLivre(ListeLivres *listeLivres, const char *nomFichierLivres);
 void afficherLivresEmpruntesParUtilisateur(Listemprunts *listeEmprunts, ListeLivres *listeLivres);
-
-
+int livreexiste(ListeLivres *ListeLivres, int idLivre);
 
 //*********************************************************** GESTION DES UTILISATEURS **********************************************************
 void initialiserListeutilisateurs(ListeUtilisateurs *liste);
-Utilisateur Enregistrementutilisateur(Utilisateur utilisateur, CelluleUtilisateur *listeUtilisateurs);
+Utilisateur Enregistrementutilisateur(Utilisateur utilisateur);
 void Ajouterutilisateurs(ListeUtilisateurs *listeUtilisateurs, Utilisateur utilisateur);
 void Afficherlisteutilisateurs(ListeUtilisateurs *listeUtilisateurs);
 void supprimerUtilisateur(ListeUtilisateurs *listeUtilisateurs, int idUtilisateur);
@@ -168,7 +167,6 @@ void augmenterExemplairesDisponibles(ListeLivres *listeLivres, int idLivre);
 void supprimerEmprunt(Listemprunts *listeEmprunts, int idEmprunt);
 void modifierEmprunt(Listemprunts *listeEmprunts, const char *emprunts);
 
-
 //*********************************************************** SAUVEGARDE DES FICHIERS  **********************************************************
 
 void sauvegarderListeLivres(ListeLivres *listeLivres, const char *livres);
@@ -177,7 +175,6 @@ void sauvegarderListeEmprunts(Listemprunts *listeEmprunts, const char *nomFichie
 void chargerListeLivres(ListeLivres *listeLivres, const char *nomFichier);
 void chargerListeUtilisateurs(ListeUtilisateurs *listeUtilisateurs, const char *nomFichier);
 void chargerListeEmprunts(Listemprunts *listeEmprunts, const char *emprunts, ListeLivres *listeLivres, ListeUtilisateurs *listeUtilisateurs);
-
 
 //*********************************************************** SATISTIQUES BIBLIOTHEQUE  **********************************************************
 
@@ -188,8 +185,5 @@ void afficherNombreExemplairesDisponibles(ListeLivres *listeLivres);
 void afficherNombreEmprunts(Listemprunts *listemprunts);
 void afficherNombreUtilisateurs(ListeUtilisateurs *listeUtilisateurs);
 void afficherNombreLivres(ListeLivres *listeLivres);
-
-
-
 
 #endif
