@@ -767,7 +767,8 @@ void supprimerEmprunt(Listemprunts *listeEmprunts, int idEmprunt)
 
     printf("Emprunt avec l'identifiant %d supprimé avec succès.\n", idEmprunt);
 
-    // Maintenant, vous devriez réécrire le fichier avec la liste mise à jour
+    // Maintenant, nous devons réécrire le fichier avec la liste mise à jour
+
     FILE *fichier = fopen("emprunts.txt", "w");
     if (fichier == NULL)
     {
@@ -775,10 +776,11 @@ void supprimerEmprunt(Listemprunts *listeEmprunts, int idEmprunt)
         return;
     }
 
+    // Parcourir la liste mise à jour et réécrire les données dans le fichier
     courant = listeEmprunts->tete;
     while (courant != NULL)
     {
-        fprintf(fichier, "%d %d %d %d %d %d\n", courant->emprunt.id_emprunt, courant->emprunt.id_utilisateur, courant->emprunt.id_livre_emprunte, courant->emprunt.date_emprunt.jour, courant->emprunt.date_emprunt.mois, courant->emprunt.date_emprunt.annee);
+        fprintf(fichier, "%d %d %d %d %d %d %d %d %d\n", courant->emprunt.id_emprunt, courant->emprunt.id_utilisateur, courant->emprunt.id_livre_emprunte, courant->emprunt.date_emprunt.jour, courant->emprunt.date_emprunt.mois, courant->emprunt.date_emprunt.annee, courant->emprunt.date_retour_prevue.jour, courant->emprunt.date_retour_prevue.mois, courant->emprunt.date_retour_prevue.annee);
         courant = courant->suivant;
     }
 
